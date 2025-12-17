@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* SECTION SELECTION MODAL */
+        .section-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .section-modal.show {
+            display: flex;
+        }
+
+        .section-modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .section-modal-content h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .section-modal-content p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .section-option {
+            padding: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+            border-left: 4px solid transparent;
+        }
+
+        .section-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .section-option.selected {
+            border-color: #667eea;
+            border-left-color: #667eea;
+            background: #e8f0fe;
+            color: #667eea;
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .confirm-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* MAIN DASHBOARD */
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .welcome-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .welcome-box h2 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .welcome-box p {
+            margin: 8px 0 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .section-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .section-info-text {
+            text-align: left;
+        }
+
+        .section-info-text strong {
+            display: block;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .section-info-text span {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .change-section-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .change-section-btn:hover {
+            background: #5568d3;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .course-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .course-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .course-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .course-card h3 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .course-card p {
+            margin: 0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 12px;
+                padding: 20px;
+            }
+
+            .section-modal-content {
+                padding: 24px;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👨‍🎓 Student Dashboard</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- Section Selection Modal -->
+    <div id="sectionModal" class="section-modal">
+        <div class="section-modal-content">
+            <h2>Choose Your Section</h2>
+            <p>Select the section you are enrolled in. You can only change this later if you contact an advisor.</p>
+            <div class="section-list" id="sectionList"></div>
+            <button class="confirm-btn" id="confirmBtn" disabled onclick="confirmSectionSelection()">Confirm Selection</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content" id="mainContent" style="display:none;">
+            <div class="welcome-box">
+                <h2 id="welcomeText">Welcome to Student Dashboard</h2>
+                <p>Track your progress, submit assignments, and communicate with your advisor.</p>
+            </div>
+
+            <div class="section-info">
+                <div class="section-info-text">
+                    <strong id="enrolledSection">Loading...</strong>
+                    <span id="enrolledInfo">Your enrolled section</span>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <button class="change-section-btn" id="viewGroupsBtn" onclick="goToGroups()" disabled>View Groups</button>
+                    <button class="change-section-btn" onclick="showSectionSelection()">Change Section</button>
+                </div>
+            </div>
+
+            <h3 style="color: #333; margin-top: 30px; margin-bottom: 20px;">Your Courses</h3>
+            <div class="courses-grid" id="coursesContainer">
+                <div class="empty-state">
+                    <p>No courses assigned yet. Contact your advisor for enrollment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedSection = null;
+        let availableSections = [];
+
+        window.addEventListener('DOMContentLoaded', function() {
+            loadAvailableSections();
+            checkStudentEnrollment();
+        });
+
+        function loadAvailableSections() {
+            try {
+                    // Load sections from advisor dashboard (preferred) or fallback to allSectionGroups
+                    const saved = localStorage.getItem('advisorSections');
+                    if (saved) {
+                        availableSections = JSON.parse(saved);
+                    } else {
+                        // fallback: build list from keys in allSectionGroups
+                        const allSectionGroups = JSON.parse(localStorage.getItem('allSectionGroups')) || {};
+                        availableSections = Object.keys(allSectionGroups).map(name => {
+                            // attempt to reuse metadata from first group if available
+                            const first = (allSectionGroups[name] && allSectionGroups[name][0]) || {};
+                            return { name, createdDate: first.createdDate || undefined };
+                        });
+                    }
+                    if (availableSections.length === 0) console.log('No sections available from advisor dashboard');
+            } catch (e) {
+                console.error('Failed to load sections', e);
+                availableSections = [];
+            }
+        }
+
+        function checkStudentEnrollment() {
+            try {
+                const currentUser = localStorage.getItem('loggedInUser');
+                const enrolled = localStorage.getItem('studentEnrolledSection');
+                const enrollmentUser = localStorage.getItem('studentEnrollmentUser');
+                
+                // Check if enrollment belongs to current user
+                const currentUsername = currentUser ? JSON.parse(currentUser).username : null;
+                
+                if (enrolled && enrollmentUser === currentUsername) {
+                    // Student already has a section under this account, show dashboard
+                    selectedSection = JSON.parse(enrolled);
+                    showMainDashboard();
+                } else {
+                    // First time for this user, show section selection
+                    showSectionSelection();
+                }
+            } catch (e) {
+                // No enrollment found, show section selection
+                showSectionSelection();
+            }
+        }
+
+        function showSectionSelection() {
+            document.getElementById('sectionModal').classList.add('show');
+            renderSectionOptions();
+        }
+
+        function renderSectionOptions() {
+            const sectionList = document.getElementById('sectionList');
+            
+            if (availableSections.length === 0) {
+                sectionList.innerHTML = '<p style="grid-column: 1/-1; color:#999;">No sections available. Please contact your advisor.</p>';
+                document.getElementById('confirmBtn').disabled = true;
+                return;
+            }
+
+            sectionList.innerHTML = availableSections.map((section, index) => `
+                <div class="section-option" data-index="${index}" onclick="selectSection(${index})">
+                    ${section.name}
+                </div>
+            `).join('');
+
+            // Re-attach event listeners
+            document.querySelectorAll('.section-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.section-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedSection = availableSections[parseInt(this.getAttribute('data-index'))];
+                    document.getElementById('confirmBtn').disabled = false;
+                });
+            });
+        }
+
+        function selectSection(index) {
+            selectedSection = availableSections[index];
+        }
+
+        function confirmSectionSelection() {
+            if (!selectedSection) {
+                alert('Please select a section');
+                return;
+            }
+
+            // Confirm selection with section name
+            if (!confirm(`Are you sure you want to join "${selectedSection.name}"? You can only change this by contacting an advisor.`)) {
+                return;
+            }
+
+            // Save enrollment to localStorage (permanent) and link to current user
+            try {
+                const currentUser = localStorage.getItem('loggedInUser');
+                const currentUsername = currentUser ? JSON.parse(currentUser).username : 'unknown';
+                localStorage.setItem('studentEnrolledSection', JSON.stringify(selectedSection));
+                localStorage.setItem('studentEnrollmentUser', currentUsername);
+                // record enrollment timestamp for display
+                if (!localStorage.getItem('studentEnrolledSince')) {
+                    localStorage.setItem('studentEnrolledSince', new Date().toISOString());
+                }
+            } catch (e) {
+                console.error('Failed to save enrollment', e);
+            }
+
+            // Show confirmation and close modal
+            alert(`You have successfully enrolled in "${selectedSection.name}". Welcome!`);
+            document.getElementById('sectionModal').classList.remove('show');
+            showMainDashboard();
+        }
+
+        function showMainDashboard() {
+            document.getElementById('mainContent').style.display = 'block';
+            
+            if (selectedSection) {
+                const currentUser = localStorage.getItem('loggedInUser');
+                const userName = currentUser ? JSON.parse(currentUser).username || 'Student' : 'Student';
+                document.getElementById('welcomeText').textContent = `Welcome back, ${userName}!`;
+                document.getElementById('enrolledSection').textContent = selectedSection.name;
+                // Prefer a createdDate on the section, else use saved enrolled timestamp if present
+                const since = selectedSection.createdDate || localStorage.getItem('studentEnrolledSince');
+                const sinceText = since ? new Date(since).toLocaleDateString() : new Date().toLocaleDateString();
+                document.getElementById('enrolledInfo').textContent = `Enrolled since ${sinceText}`;
+                // enable view groups button
+                const vg = document.getElementById('viewGroupsBtn');
+                if (vg) vg.disabled = false;
+            }
+
+            renderCourses();
+        }
+
+        function goToGroups() {
+            if (!selectedSection) { alert('No section selected'); return; }
+            window.location.href = `research-group.html?section=${encodeURIComponent(selectedSection.name)}`;
+        }
+
+        function renderCourses() {
+            const coursesContainer = document.getElementById('coursesContainer');
+            
+            // Demo courses
+            const courses = [
+                { name: 'Research Methods', icon: '📚', progress: 65 },
+                { name: 'Data Analysis', icon: '📊', progress: 45 },
+                { name: 'Project Management', icon: '🎯', progress: 80 }
+            ];
+
+            coursesContainer.innerHTML = courses.map(course => `
+                <div class="course-card">
+                    <div class="course-icon">${course.icon}</div>
+                    <h3>${course.name}</h3>
+                    <p>Progress: ${course.progress}%</p>
+                    <div style="background:#e0e0e0; height:6px; border-radius:3px; margin-top:12px; overflow:hidden;">
+                        <div style="background:#667eea; height:100%; width:${course.progress}%;"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function requestSectionChange() {
+            alert('Section change request sent to your advisor. They will review and approve your request.');
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('userRole');
+            // Note: studentEnrolledSection is NOT removed - permanent enrollment
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

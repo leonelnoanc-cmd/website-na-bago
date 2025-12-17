@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Research Tool</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+
+  #editor {
+    border: 1px solid #ccc;
+    padding: 15px;
+    min-height: 300px;
+    margin-bottom: 20px;
+  }
+
+  /* Custom context menu */
+  #context-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    width: 180px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+  }
+
+  #context-menu button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  #context-menu button:hover {
+    background: #f0f0f0;
+  }
+
+  #output {
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h2>Smart Research Tool</h2>
+<p>Highlight any statement and right-click to add RRL or RRS.</p>
+
+<div id="editor" contenteditable="true">
+  Type or paste your research content here. For example: "The effects of social media on academic performance are widely debated."
+</div>
+
+<!-- Custom Context Menu -->
+<div id="context-menu">
+  <button onclick="addRRL()">Add RRL</button>
+  <button onclick="addRRS()">Add RRS</button>
+</div>
+
+<div id="output">
+  <h3>Saved Entries</h3>
+  <ul id="entries"></ul>
+</div>
+
+<script>
+const editor = document.getElementById('editor');
+const contextMenu = document.getElementById('context-menu');
+let selectedText = '';
+
+// Show custom context menu
+editor.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  selectedText = window.getSelection().toString().trim();
+  if (!selectedText) return; // Do nothing if no text is selected
+  contextMenu.style.top = e.pageY + 'px';
+  contextMenu.style.left = e.pageX + 'px';
+  contextMenu.style.display = 'block';
+});
+
+// Hide menu on click elsewhere
+document.addEventListener('click', () => {
+  contextMenu.style.display = 'none';
+});
+
+// Add RRL function
+function addRRL() {
+  if (!selectedText) return;
+  const entry = document.createElement('li');
+  entry.textContent = 'RRL: ' + selectedText;
+  document.getElementById('entries').appendChild(entry);
+  contextMenu.style.display = 'none';
+}
+
+// Add RRS function
+function addRRS() {
+  if (!selectedText) return;
+  const entry = document.createElement('li');
+  entry.textContent = 'RRS: ' + selectedText;
+  document.getElementById('entries').appendChild(entry);
+  contextMenu.style.display = 'none';
+}
+</script>
+
+</body>
+</html>

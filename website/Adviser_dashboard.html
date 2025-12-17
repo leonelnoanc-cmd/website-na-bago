@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Advisor Dashboard</title>
+<style>
+* { box-sizing: border-box; }
+body { margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f7fa; }
+
+/* HEADER */
+.header { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; padding:20px 40px; display:flex; justify-content:space-between; align-items:center; }
+.logout-btn { background: rgba(255,255,255,0.2); color:white; border:1px solid white; padding:8px 16px; border-radius:6px; cursor:pointer; transition:0.3s; }
+.logout-btn:hover { background: rgba(255,255,255,0.3); }
+
+/* CONTAINER */
+.container { max-width:1400px; margin:0 auto; padding:40px 20px; display:grid; grid-template-columns:100px 1fr; gap:20px; }
+
+/* SIDEBAR */
+.sidebar { background:white; border-radius:12px; padding:16px; position:sticky; top:100px; display:flex; flex-direction:column; align-items:center; gap:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+
+.add-section-card { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); width:70px; height:70px; border-radius:50%; cursor:pointer; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 15px rgba(102,126,234,0.3); transition:0.3s; }
+.add-section-card:hover { transform: scale(1.1); box-shadow:0 8px 25px rgba(102,126,234,0.5); }
+.add-section-card .plus-icon { font-size:40px; color:white; }
+
+.analytics-card { width:70px; height:70px; border-radius:50%; background:#f0f3ff; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:22px; transition:0.3s; border:2px solid transparent; }
+.analytics-card span { font-size:10px; font-weight:600; margin-top:2px; }
+.analytics-card:hover { background:#e0e7ff; border-color:#667eea; transform:scale(1.1); }
+
+/* MAIN CONTENT */
+.main-content { background:none; }
+.info-box { background:white; padding:30px; border-radius:12px; margin-bottom:30px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+.sections-container { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; }
+.section-card {
+    background: #b0c4de;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 2px solid transparent;
+    font-weight:600;
+    font-size:16px;
+}
+.section-card:hover { transform: translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.15); border-color:#667eea; }
+.section-actions { display:flex; justify-content:center; gap:8px; margin-top:12px; }
+.section-btn { padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; transition:all 0.2s; }
+.share-btn { background:#27ae60; color:white; }
+.share-btn:hover { background:#229954; }
+.rename-btn { background:#667eea; color:white; }
+.rename-btn:hover { background:#5568d3; }
+.delete-btn { background:#e74c3c; color:white; }
+.delete-btn:hover { background:#c0392b; }
+
+.empty-state { text-align:center; padding:60px; color:#999; font-size:16px; }
+
+/* MODAL */
+.modal { display: none; position: fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color: rgba(0,0,0,0.4); justify-content:center; align-items:center; }
+.modal.show { display:flex; }
+.modal-content { background:white; padding:30px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.3); }
+.close-btn { background:none; border:none; font-size:28px; cursor:pointer; color:#999; float:right; }
+.close-btn:hover { color:#333; }
+.modal-input { width:100%; padding:10px 12px; margin-bottom:20px; border:2px solid #ddd; border-radius:6px; font-size:14px; }
+.modal-input:focus { outline:none; border-color:#667eea; box-shadow:0 0 0 3px rgba(102,126,234,0.1); }
+.modal-buttons { display:flex; gap:12px; justify-content:flex-end; }
+.modal-btn { padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600; transition:0.3s; }
+.save-btn { background:#27ae60; color:white; }
+.save-btn:hover { background:#229954; }
+.cancel-btn { background:#ddd; color:#333; }
+.cancel-btn:hover { background:#ccc; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>👨‍💼 Advisor Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="add-section-card" onclick="openAddSectionModal()" title="Add Section">
+            <div class="plus-icon">+</div>
+        </div>
+        <div class="analytics-card" onclick="openAnalytics()" title="Research Analytics">
+            📊<span>Analytics</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="info-box">
+            <p>📌 Manage your sections below. Click a section to open its groups.</p>
+        </div>
+
+        <h2>Your Sections</h2>
+        <div class="sections-container" id="sectionsContainer"></div>
+        <div class="empty-state" id="emptyState">No sections yet.</div>
+    </div>
+</div>
+
+<!-- Add Section Modal -->
+<div id="addSectionModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeAddSectionModal()">&times;</button>
+        <h2>Add New Section</h2>
+        <input type="text" id="addSectionInput" class="modal-input" placeholder="Section name">
+        <div class="modal-buttons">
+            <button class="modal-btn cancel-btn" onclick="closeAddSectionModal()">Cancel</button>
+            <button class="modal-btn save-btn" onclick="saveAddSection()">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rename Section Modal -->
+<div id="renameModal" class="modal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeRenameModal()">&times;</button>
+        <h2>Rename Section</h2>
+        <input type="text" id="renameInput" class="modal-input" placeholder="Section name">
+        <div class="modal-buttons">
+            <button class="modal-btn cancel-btn" onclick="closeRenameModal()">Cancel</button>
+            <button class="modal-btn save-btn" onclick="saveRename()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- First-Time Setup Modal -->
+<div id="firstTimeModal" class="modal">
+    <div class="modal-content">
+        <h2>Welcome! How many sections do you want to create?</h2>
+        <input type="number" id="sectionCountInput" class="modal-input" placeholder="Number of sections" min="1">
+        <div class="modal-buttons">
+            <button class="modal-btn save-btn" id="saveSectionCount">Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let sections = [];
+let renameIndex = -1;
+
+const sectionsContainer = document.getElementById('sectionsContainer');
+const emptyState = document.getElementById('emptyState');
+const addSectionModal = document.getElementById('addSectionModal');
+const addSectionInput = document.getElementById('addSectionInput');
+const renameModal = document.getElementById('renameModal');
+const renameInput = document.getElementById('renameInput');
+const firstTimeModal = document.getElementById('firstTimeModal');
+const sectionCountInput = document.getElementById('sectionCountInput');
+
+// Load sections
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('advisorSections');
+    sections = saved ? JSON.parse(saved) : [];
+
+    const firstTime = !localStorage.getItem('firstTimeSetup');
+    if(firstTime){
+        firstTimeModal.classList.add('show');
+        sectionCountInput.focus();
+    }
+
+    renderSections();
+});
+
+document.getElementById('saveSectionCount').onclick = () => {
+    const count = parseInt(sectionCountInput.value);
+    if(isNaN(count) || count < 1) return alert('Enter a valid number');
+
+    // Create default sections
+    sections = [];
+    for(let i=1;i<=count;i++){
+        sections.push({name: `Section ${i}`});
+    }
+    saveSections();
+    renderSections();
+
+    localStorage.setItem('firstTimeSetup', 'done');
+    firstTimeModal.classList.remove('show');
+};
+
+// Existing functions
+function openAnalytics() { window.location.href = 'research-analytics.html'; }
+
+function renderSections() {
+    sectionsContainer.innerHTML = '';
+    emptyState.style.display = sections.length ? 'none' : 'block';
+
+    sections.forEach((s, i) => {
+        const card = document.createElement('div');
+        card.className = 'section-card';
+
+        const title = document.createElement('h3');
+        title.textContent = s.name;
+        card.appendChild(title);
+
+        const actions = document.createElement('div');
+        actions.className = 'section-actions';
+
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'section-btn share-btn';
+        shareBtn.textContent = 'Share';
+        shareBtn.onclick = (e) => { e.stopPropagation(); shareSection(i); };
+
+        const renameBtn = document.createElement('button');
+        renameBtn.className = 'section-btn rename-btn';
+        renameBtn.textContent = 'Rename';
+        renameBtn.onclick = (e) => { e.stopPropagation(); openRenameModal(i); };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'section-btn delete-btn';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = (e) => { e.stopPropagation(); deleteSection(i); };
+
+        actions.appendChild(shareBtn);
+        actions.appendChild(renameBtn);
+        actions.appendChild(deleteBtn);
+
+        card.appendChild(actions);
+
+        card.onclick = () => {
+            localStorage.setItem('currentSection', JSON.stringify(sections[i]));
+            window.location.href = 'section-groups.html';
+        };
+
+        sectionsContainer.appendChild(card);
+    });
+}
+
+// Add Section Modal
+function openAddSectionModal() {
+    addSectionModal.classList.add('show');
+    addSectionInput.value = '';
+    addSectionInput.focus();
+}
+function closeAddSectionModal() { addSectionModal.classList.remove('show'); }
+function saveAddSection() {
+    const name = addSectionInput.value.trim();
+    if (!name) return alert('Section name cannot be empty');
+    sections.push({ name });
+    saveSections();
+    renderSections();
+    closeAddSectionModal();
+}
+addSectionInput.addEventListener('keypress', (e) => { if(e.key==='Enter') saveAddSection(); });
+
+// Rename Section Modal
+function openRenameModal(index) {
+    renameIndex = index;
+    renameInput.value = sections[index].name;
+    renameModal.classList.add('show');
+    renameInput.focus();
+}
+function closeRenameModal() { renameModal.classList.remove('show'); renameIndex=-1; }
+function saveRename() {
+    const newName = renameInput.value.trim();
+    if(!newName) return alert('Section name cannot be empty');
+    sections[renameIndex].name = newName;
+    saveSections();
+    renderSections();
+    closeRenameModal();
+}
+
+// Share & Delete
+function shareSection(index) {
+    const url = `${window.location.origin}/section-groups.html?section=${encodeURIComponent(sections[index].name)}`;
+    navigator.clipboard.writeText(url).then(()=>alert('Section link copied!'));
+}
+function deleteSection(index) {
+    if(confirm(`Delete section "${sections[index].name}"?`)){
+        sections.splice(index,1);
+        saveSections();
+        renderSections();
+    }
+}
+
+function saveSections() { localStorage.setItem('advisorSections', JSON.stringify(sections)); }
+function logout() {
+    localStorage.removeItem('loggedInUser');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('advisorSections');
+    localStorage.removeItem('currentSection');
+    localStorage.removeItem('firstTimeSetup');
+    window.location.href='login.html';
+}
+
+// Close modals on background click
+window.addEventListener('click', (e) => {
+    if(e.target===addSectionModal) closeAddSectionModal();
+    if(e.target===renameModal) closeRenameModal();
+    if(e.target===firstTimeModal) firstTimeModal.classList.remove('show');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: Research Monitoring API (minimal)
+  version: 0.1.0
+paths:
+  /submissions:
+    post:
+      summary: Create a submission (upload file handled separately)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Submission'
+      responses:
+        '201':
+          description: Created
+  /submissions/{id}/versions:
+    post:
+      summary: Add a new version to a submission (multipart/form-data upload)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Version created
+  /submissions/{id}:
+    get:
+      summary: Get submission with versions and comments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    Submission:
+      type: object
+      properties:
+        groupId:
+          type: string
+        milestoneId:
+          type: string
+        uploaderId:
+          type: string
+        status:
+          type: string
+          enum: [NotStarted, Started, Submitted, UnderReview, Accepted]
