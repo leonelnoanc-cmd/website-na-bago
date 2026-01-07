@@ -1,247 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Login</title>
-	<style>
-		* { box-sizing: border-box; }
-		
-		body {
-			margin: 0;
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			min-height: 100vh;
-			padding: 20px;
-		}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
 
-		.container {
-			background: white;
-			padding: 40px;
-			width: 100%;
-			max-width: 400px;
-			border-radius: 12px;
-			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-		}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-		h2 {
-			text-align: center;
-			margin: 0 0 30px 0;
-			color: #333;
-			font-size: 24px;
-		}
+        body {
+            background: #d9d9d9; /* gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-		.form-group {
-			margin-bottom: 18px;
-		}
+        .container {
+            background: white;
+            width: 350px;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            animation: fadeIn 0.6s ease-in-out;
+        }
 
-		label {
-			display: block;
-			font-size: 13px;
-			font-weight: 600;
-			color: #555;
-			margin-bottom: 6px;
-		}
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(10px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
 
-		input {
-			width: 100%;
-			padding: 12px 14px;
-			border: 2px solid #ddd;
-			border-radius: 8px;
-			font-size: 14px;
-			transition: border-color 0.3s, box-shadow 0.3s;
-		}
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: black;
+        }
 
-		input:focus {
-			outline: none;
-			border-color: #667eea;
-			box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-		}
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            transition: 0.3s;
+            color: black;
+        }
 
-		input.error {
-			border-color: #e74c3c;
-		}
+        input::placeholder {
+            color: black;
+        }
 
-		.error-message {
-			color: #e74c3c;
-			font-size: 12px;
-			margin-top: 5px;
-			display: none;
-		}
+        input:focus {
+            border-color: black;
+            outline: none;
+        }
 
-		.error-message.show {
-			display: block;
-		}
+        button {
+            width: 100%;
+            padding: 12px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
 
-		button {
-			width: 100%;
-			padding: 12px;
-			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-			border: none;
-			border-radius: 8px;
-			color: white;
-			font-size: 16px;
-			font-weight: 600;
-			cursor: pointer;
-			margin-top: 20px;
-			transition: transform 0.2s, box-shadow 0.2s;
-		}
+        button:hover {
+            background: #333;
+        }
 
-		button:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-		}
+        .signup-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 14px;
+        }
 
-		button:active {
-			transform: translateY(0);
-		}
+        .signup-link a {
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+        }
 
-		.signup-link {
-			text-align: center;
-			margin-top: 18px;
-			font-size: 14px;
-			color: #666;
-		}
-
-		.signup-link a {
-			color: #667eea;
-			text-decoration: none;
-			font-weight: 600;
-			transition: color 0.2s;
-		}
-
-		.signup-link a:hover {
-			color: #764ba2;
-		}
-
-		.forgot-password {
-			text-align: right;
-			margin-top: 10px;
-		}
-
-		.forgot-password a {
-			color: #667eea;
-			text-decoration: none;
-			font-size: 12px;
-			transition: color 0.2s;
-		}
-
-		.forgot-password a:hover {
-			color: #764ba2;
-		}
-	</style>
+        .error {
+            color: red;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
 
-	<div class="container" id="login">
-		<h2>Log In</h2>
+    <div class="container">
+        <h2>Login</h2>
 
-		<form id="loginForm" onsubmit="login(event)">
-			<div class="form-group">
-				<label for="loginUser">Username or Email</label>
-				<input type="text" id="loginUser" placeholder="Enter your username or email" required>
-				<div class="error-message" id="userError"></div>
-			</div>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
 
-			<div class="form-group">
-				<label for="loginPassword">Password</label>
-				<input type="password" id="loginPassword" placeholder="Enter your password" required>
-				<div class="error-message" id="passwordError"></div>
-				<div class="forgot-password">
-					<a href="#">Forgot password?</a>
-				</div>
-			</div>
+            <p id="message"></p>
 
-			<button type="submit">Login</button>
-		</form>
+            <button type="submit">Login</button>
+        </form>
 
-		<div class="signup-link">
-			Don't have an account? <a href="signup.html">Sign up</a>
-		</div>
-	</div>
+        <p class="signup-link">
+            Don't have an account? <a href="signup.html">Sign Up</a>
+        </p>
+    </div>
 
-<script>
-function clearErrors() {
-	document.querySelectorAll('.error-message').forEach(el => el.classList.remove('show'));
-	document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
-}
+    <script>
+        const form = document.getElementById("loginForm");
+        const msg = document.getElementById("message");
 
-function showError(fieldId, message) {
-	const errorEl = document.getElementById(fieldId + 'Error');
-	errorEl.textContent = message;
-	errorEl.classList.add('show');
-	document.getElementById(fieldId).classList.add('error');
-}
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
 
-function login(event) {
-	event.preventDefault();
-	clearErrors();
+            let email = document.getElementById("email").value.trim();
+            let password = document.getElementById("password").value;
 
-	let user = document.getElementById('loginUser').value.trim();
-	let pass = document.getElementById('loginPassword').value;
+            msg.textContent = "";
+            msg.className = "";
 
-	let isValid = true;
+            if (email === "" || password === "") {
+                msg.textContent = "Please fill in all fields.";
+                msg.className = "error";
+                return;
+            }
 
-	if (!user) {
-		showError('user', 'Username or email is required');
-		isValid = false;
-	}
+            // Placeholder login logic
+            // Replace with real authentication later
+            if (email === "test@example.com" && password === "123456") {
+                msg.textContent = "Login successful!";
+                msg.style.color = "green";
 
-	if (!pass) {
-		showError('password', 'Password is required');
-		isValid = false;
-	}
-
-	if (!isValid) return;
-
-	// Validate against saved user account
-	const savedUser = localStorage.getItem('userSignup');
-	
-	if (!savedUser) {
-		showError('user', 'No account found. Please sign up first.');
-		return;
-	}
-
-	try {
-		const accountData = JSON.parse(savedUser);
-		
-		// Check if username/email and password match
-		if ((accountData.username === user || accountData.email === user) && accountData.password === pass) {
-			// Clear old user data (section enrollment, previous session data)
-			const loggedInUser = localStorage.getItem('loggedInUser');
-			if (loggedInUser && loggedInUser !== user) {
-				// Different user logging in, clear their section enrollment
-				localStorage.removeItem('studentEnrolledSection');
-			}
-			
-			// Login successful
-			localStorage.setItem('loggedInUser', JSON.stringify({
-				username: accountData.username,
-				email: accountData.email
-			}));
-			localStorage.setItem('userRole', accountData.role || 'student');
-			
-			// Redirect to role selection if role not set
-			const userRole = accountData.role || localStorage.getItem('userRole') || 'student';
-			
-			if (userRole === 'adviser') {
-				window.location.href = 'Adviser_dashboard.html';
-			} else {
-				// Student goes to role selection first if needed, or directly to student dashboard
-				window.location.href = 'Student_dashboard.html';
-			}
-		} else {
-			showError('user', 'Invalid username/email or password');
-		}
-	} catch(e) {
-		showError('user', 'Login failed. Please try again.');
-		console.error('Login error:', e);
-	}
-}
-</script>
+                // Redirect to dashboard
+                // setTimeout(() => window.location.href = "dashboard.html", 1000);
+            } else {
+                msg.textContent = "Invalid email or password.";
+                msg.className = "error";
+            }
+        });
+    </script>
 
 </body>
 </html>

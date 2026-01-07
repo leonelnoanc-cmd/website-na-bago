@@ -1,361 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Advisor Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advisor Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-<style>
-* { box-sizing: border-box; }
-body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f7fa; }
+        body {
+            background: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+        }
 
-/* HEADER */
-.header {
-    background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-    color:white;
-    padding:20px 40px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-.logout-btn {
-    background: rgba(255,255,255,0.2);
-    color:white;
-    border:1px solid white;
-    padding:8px 16px;
-    border-radius:6px;
-    cursor:pointer;
-}
-.logout-btn:hover { background: rgba(255,255,255,0.3); }
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: lightgray; 
+            color: black;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
 
-/* CONTAINER */
-.container {
-    max-width:1400px;
-    margin:0 auto;
-    padding:40px 20px;
-    display:grid;
-    grid-template-columns:100px 1fr;
-    gap:20px;
-}
+        .sidebar h2 {
+            margin-bottom: 30px;
+            font-size: 22px;
+            text-align: center;
+        }
 
-/* SIDEBAR */
-.sidebar {
-    background:white;
-    border-radius:12px;
-    padding:16px;
-    position:sticky;
-    top:100px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
+        .sidebar a {
+            color: black;
+            text-decoration: none;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
 
-.add-section-card {
-    background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    cursor:pointer;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-.add-section-card:hover { transform:scale(1.1); }
-.add-section-card .plus-icon { font-size:40px; color:white; }
+        .sidebar a:hover {
+            background: white;
+        }
 
-.analytics-card {
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    background:#f0f3ff;
-    cursor:pointer;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    font-size:22px;
-    transition:0.3s;
-}
-.analytics-card span {
-    font-size:10px;
-    font-weight:600;
-    margin-top:2px;
-}
-.analytics-card:hover {
-    background:#e0e7ff;
-    transform:scale(1.1);
-}
+        .logout-btn {
+            margin-top: auto;
+            padding: 12px;
+            background: black;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
-/* MAIN CONTENT */
-.info-box {
-    background:white;
-    padding:30px;
-    border-radius:12px;
-    margin-bottom:30px;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);
-}
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
 
-.sections-container {
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
-    gap:25px;
-}
+        #add-section-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
-.section-card {
-    background:#b0c4de;
-    padding:30px;
-    border-radius:15px;
-    min-height:180px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    cursor:pointer;
-    box-shadow:0 2px 12px rgba(0,0,0,0.1);
-    border: 2px solid transparent;
-    transition: all 0.3s;
-}
-.section-card:hover {
-    transform:translateY(-6px);
-    box-shadow:0 10px 25px rgba(0,0,0,0.15);
-    border-color:#667eea;
-}
-.section-card h3 {
-    margin:0 0 12px 0;
-    font-size:20px;
-    font-weight:700;
-}
-.section-card p {
-    margin:0 0 12px 0;
-    font-size:14px;
-    color:#333;
-}
+        #add-section-bar div {
+            display: flex;
+            align-items: center;
+            background: lightgray;
+            padding: 12px 20px;
+            border-radius: 12px;
+            
+            /* Increased width */
+            width: 95%;
+            max-width: 1100px;  /* You can increase more if needed */
 
-/* Buttons */
-.section-actions {
-    display:flex;
-    gap:10px;
-    justify-content:center;
-}
-.section-btn {
-    padding:8px 14px;
-    border:none;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:13px;
-    font-weight:600;
-    transition:all 0.2s;
-}
-.share-btn { background:#27ae60; color:white; }
-.share-btn:hover { background:#229954; }
-.rename-btn { background:#667eea; color:white; }
-.rename-btn:hover { background:#5568d3; }
-.delete-btn { background:#e74c3c; color:white; }
-.delete-btn:hover { background:#c0392b; }
+            cursor: pointer;
+            color: black;
+            font-weight: bold;
+            justify-content: space-between;
+        }
 
-.empty-state {
-    text-align:center;
-    padding:60px;
-    color:#999;
-}
+        #add-section-form {
+            display: none;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
-/* MODAL */
-.modal {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.4);
-    justify-content:center;
-    align-items:center;
-}
-.modal.show { display:flex; }
-.modal-content {
-    background:white;
-    padding:30px;
-    border-radius:12px;
-    width:90%;
-    max-width:400px;
-}
-.modal-input {
-    width:100%;
-    padding:10px;
-    margin-bottom:20px;
-}
-.modal-buttons {
-    display:flex;
-    justify-content:flex-end;
-    gap:10px;
-}
-.modal-btn {
-    padding:10px 20px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    font-weight:600;
-    transition:all 0.3s;
-}
-.save-btn { background:#27ae60; color:white; }
-.save-btn:hover { background:#229954; }
-.cancel-btn { background:#ddd; color:#333; }
-.cancel-btn:hover { background:#ccc; }
-</style>
+        #add-section-form input {
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid white;
+            width: 300px;
+        }
+
+        #add-section-form button {
+            padding: 8px 12px;
+            background: darkgray;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .card {
+            background: lightgray;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px black;
+
+            /* Increased width */
+            width: 95%;
+            max-width: 1100px;  /* You can increase more if needed */
+
+            margin: 0 auto;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        /* MODAL FOR CHOOSING NUMBER OF SECTIONS */
+        #sectionModal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalContent {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 4px 15px black;
+        }
+
+        #modalContent input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid gray;
+            margin-top: 15px;
+        }
+
+        #modalContent button {
+            width: 100%;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: none;
+            margin-top: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="header">
-    <h1>👨‍💼 Advisor Dashboard</h1>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-</div>
-
-<div class="container">
-
-    <!-- SIDEBAR -->
+    <!-- Sidebar -->
     <div class="sidebar">
-        <div class="add-section-card" onclick="openAddSectionModal()" title="Add Section">
-            <div class="plus-icon">+</div>
-        </div>
+        <h2>Advisor</h2>
+        <a href="#">Dashboard</a>
+        <a href="#">Research Analytics</a>
+        <div class="logout-btn" onclick="logout()">Logout</div>
+    </div>
 
-        <div class="analytics-card" onclick="openAnalytics()" title="Research Analytics">
-            📊<span>Analytics</span>
-        </div>
-
-        <div class="analytics-card" onclick="openSubmissionTracker()" title="Submission Tracker">
-            📥<span>Submissions</span>
+    <!-- Modal: Choose Number of Sections -->
+    <div id="sectionModal">
+        <div id="modalContent">
+            <h3>How many sections do you want?</h3>
+            <input type="number" id="sectionCount" placeholder="Enter number">
+            <button onclick="saveSectionCount()">Continue</button>
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
+    <!-- Main Content -->
     <div class="main-content">
-        <div class="info-box">
-            📌 Manage your sections below. Click a section to open its groups.
+        <h1>Welcome, Advisor!</h1>
+
+        <div id="add-section-bar">
+            <div id="add-section-btn">
+                <span>Add New Section</span>
+                <span style="font-size: 20px;">+</span>
+            </div>
         </div>
 
-        <h2>Your Sections</h2>
-        <div class="sections-container" id="sectionsContainer"></div>
-        <div class="empty-state" id="emptyState">No sections yet.</div>
-    </div>
-</div>
-
-<!-- ADD SECTION MODAL -->
-<div id="addSectionModal" class="modal">
-    <div class="modal-content">
-        <h2>Add Section</h2>
-        <input type="text" id="sectionNameInput" class="modal-input" placeholder="Section name">
-        <div class="modal-buttons">
-            <button class="modal-btn cancel-btn" onclick="closeAddSectionModal()">Cancel</button>
-            <button class="modal-btn save-btn" onclick="saveAddSection()">Add Section</button>
+        <div id="add-section-form">
+            <input type="text" id="section-title" placeholder="Section Title">
+            <button onclick="addSection()">Add</button>
         </div>
+
+        <div class="card-container"></div>
     </div>
-</div>
 
-<script>
-let sections = [];
+    <script>
+/* GLOBAL */
+const cardContainer = document.querySelector(".card-container");
 
-window.onload = () => {
-    sections = JSON.parse(localStorage.getItem('advisorSections')) || [];
-    renderSections();
+/* LOAD SECTIONS */
+function loadSections() {
+    const sections = JSON.parse(localStorage.getItem("sections")) || [];
+    cardContainer.innerHTML = "";
+    sections.forEach(title => createCard(title));
+}
+
+/* SAVE SECTION */
+function saveSection(title) {
+    const sections = JSON.parse(localStorage.getItem("sections")) || [];
+    sections.push(title);
+    localStorage.setItem("sections", JSON.stringify(sections));
+}
+
+/* ADD SECTION */
+function addSection() {
+    const input = document.getElementById("section-title");
+    const title = input.value.trim();
+
+    if (!title) {
+        alert("Please enter a section title.");
+        return;
+    }
+
+    saveSection(title);
+    loadSections();
+    input.value = "";
+}
+
+/* DELETE SECTION */
+function deleteSection(title) {
+    let sections = JSON.parse(localStorage.getItem("sections")) || [];
+    sections = sections.filter(section => section !== title);
+    localStorage.setItem("sections", JSON.stringify(sections));
+    loadSections();
+}
+
+/* RENAME SECTION */
+function renameSection(oldTitle) {
+    let sections = JSON.parse(localStorage.getItem("sections")) || [];
+    const newTitle = prompt("Enter new section name:", oldTitle);
+
+    if (!newTitle || newTitle.trim() === "") return;
+
+    const index = sections.indexOf(oldTitle);
+    if (index !== -1) sections[index] = newTitle.trim();
+
+    localStorage.setItem("sections", JSON.stringify(sections));
+    loadSections();
+}
+
+/* CREATE CARD */
+function createCard(title) {
+    const card = document.createElement("div");
+    card.classList.add("card");
+
+    const text = document.createElement("h3");
+    text.textContent = title;
+
+    const buttonBox = document.createElement("div");
+    buttonBox.style.display = "flex";
+    buttonBox.style.gap = "10px";
+
+    const renameBtn = document.createElement("button");
+    renameBtn.textContent = "Rename";
+    renameBtn.style.background = "#3b82f6";
+    renameBtn.style.color = "white";
+    renameBtn.style.border = "none";
+    renameBtn.style.padding = "6px 10px";
+    renameBtn.style.borderRadius = "5px";
+    renameBtn.style.cursor = "pointer";
+
+    renameBtn.onclick = (e) => {
+        e.stopPropagation();
+        renameSection(title);
+    };
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.classList.add("delete-btn");
+
+    deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        deleteSection(title);
+    };
+
+    card.onclick = () => {
+        window.location.href = `group-ambot.html?name=${encodeURIComponent(title)}`;
+    };
+
+    buttonBox.appendChild(renameBtn);
+    buttonBox.appendChild(deleteBtn);
+
+    card.appendChild(text);
+    card.appendChild(buttonBox);
+
+    cardContainer.appendChild(card);
+}
+
+/* TOGGLE ADD FORM */
+document.getElementById("add-section-btn").onclick = () => {
+    const form = document.getElementById("add-section-form");
+    form.style.display = form.style.display === "none" ? "flex" : "none";
 };
 
-function renderSections(){
-    const container = document.getElementById('sectionsContainer');
-    const empty = document.getElementById('emptyState');
-    container.innerHTML = '';
-    empty.style.display = sections.length ? 'none' : 'block';
-
-    sections.forEach((s,i)=>{
-        const card = document.createElement('div');
-        card.className='section-card';
-        card.innerHTML = `
-            <h3>${s.name}</h3>
-            <p>Students: ${s.students || 0}</p>
-            <div class="section-actions">
-                <button class="section-btn share-btn">Share</button>
-                <button class="section-btn rename-btn">Rename</button>
-                <button class="section-btn delete-btn">Delete</button>
-            </div>
-        `;
-
-        // Buttons
-        card.querySelector('.share-btn').onclick = e => {
-            e.stopPropagation();
-            
-            // Get groups for this section
-            const allGroups = JSON.parse(localStorage.getItem('allSectionGroups')) || {};
-            const sectionGroups = allGroups[s.name] || [];
-
-            // Encode groups as JSON and URL encode it
-            const groupsParam = encodeURIComponent(JSON.stringify(sectionGroups));
-
-            // Create the shareable link
-            const link = `${location.origin}/Student_dashboard.html?section=${encodeURIComponent(s.name)}&groups=${groupsParam}`;
-
-            // Copy link to clipboard
-            navigator.clipboard.writeText(link).then(() => {
-                alert('Section link copied! Share it with your students.');
-            }).catch(() => {
-                alert('Failed to copy link. Please copy manually: ' + link);
-            });
-        };
-
-        card.querySelector('.rename-btn').onclick = e=>{
-            e.stopPropagation();
-            const newName = prompt('Rename section:', s.name);
-            if(newName){
-                sections[i].name = newName;
-                saveSections();
-                renderSections();
-            }
-        };
-        card.querySelector('.delete-btn').onclick = e=>{
-            e.stopPropagation();
-            if(confirm(`Delete "${s.name}"?`)){
-                sections.splice(i,1);
-                saveSections();
-                renderSections();
-            }
-        };
-
-        card.onclick = ()=>{
-            localStorage.setItem('currentSection', JSON.stringify(s));
-            window.location.href='section-groups.html';
-        };
-
-        container.appendChild(card);
-    });
+/* LOGOUT */
+function logout() {
+    window.location.href = "login.html";
 }
 
-function openAddSectionModal(){
-    document.getElementById('addSectionModal').classList.add('show');
-    document.getElementById('sectionNameInput').value='';
-    document.getElementById('sectionNameInput').focus();
-}
-
-function closeAddSectionModal(){
-    document.getElementById('addSectionModal').classList.remove('show');
-}
-
-function saveAddSection(){
-    const name = document.getElementById('sectionNameInput').value.trim();
-    if(!name) return alert('Section name cannot be empty');
-
-    sections.push({ name: name, students: 0 });
-    saveSections();
-    renderSections();
-    closeAddSectionModal();
-}
-
-function saveSections(){
-    localStorage.setItem('advisorSections', JSON.stringify(sections));
-}
-
-function openAnalytics(){ window.location.href='research-analytics.html'; }
-function openSubmissionTracker(){ window.location.href='submission-tracker.html'; }
-function logout(){ localStorage.clear(); window.location.href='login.html'; }
+/* LOAD ON START */
+window.onload = loadSections;
 </script>
+
+
+
 
 </body>
 </html>

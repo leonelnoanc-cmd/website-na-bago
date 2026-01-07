@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Group Page</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif;}
+    body { display:flex; background:#f0f2f5; min-height:100vh;}
+    .sidebar { width:250px; background:#333; color:white; padding:25px 15px; box-shadow:4px 0 10px rgba(0,0,0,0.3);}
+    .sidebar h2 { text-align:center; margin-bottom:30px; font-size:20px; letter-spacing:1px;}
+    .sidebar ul { list-style:none;}
+    .sidebar ul li { padding:14px 10px; background:black; margin-bottom:10px; border-radius:8px; cursor:pointer; transition:0.3s;}
+    .sidebar ul li:hover { background:#555;}
+    .content { flex:1; padding:25px;}
+    .content h1 { margin-bottom:20px; font-size:26px; color:#111827;}
+    input, button { font-family:Arial,sans-serif;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2 id="group-title-sidebar">Group Name</h2>
+    <ul>
+        <li onclick="showSection('overview')">Overview</li>
+        <li onclick="showSection('tracker')">Submission Tracker</li>
+        <li onclick="showSection('progressSection')">Progress</li>
+        <li onclick="showSection('history')">History</li>
+        <li onclick="showSection('notifications')">Notifications</li>
+        <li onclick="showSection('progressBar')">Progress Bar</li>
+        <li onclick="showSection('feedback')">Feedback</li>
+
+    </ul>
+</div>
+
+<div class="content">
+    <h1 id="section-title">Overview</h1>
+    <div id="section-content" class="section-box">
+        <p>Welcome to the group page. Choose a section from the sidebar.</p>
+    </div>
+</div>
+
+<script>
+// ======= Get group name from URL =======
+const params = new URLSearchParams(window.location.search);
+const groupName = params.get("name") || "Unnamed Group";
+document.getElementById("group-title-sidebar").textContent = groupName;
+
+// ======= Show Section Function =======
+function showSection(section) {
+    
+    const title = document.getElementById("section-title");
+    const content = document.getElementById("section-content");
+
+    if (section === "overview") {
+        title.textContent = "Overview";
+        content.innerHTML = `
+            <div style="background:#fff; padding:20px; border-radius:12px;">
+                <h3>Research Section Completion (Quick View)</h3>
+                <ul style="line-height:1.8; margin-top:15px; list-style:none;">
+                    <li><strong>Chapter 1:</strong> Introduction – <span style="color:green;">Completed</span></li>
+                    <li><strong>Chapter 2:</strong> RRL / RRS – <span style="color:orange;">In Progress</span></li>
+                    <li><strong>Chapter 3:</strong> Methodology – <span style="color:red;">Delayed</span></li>
+                    <li><strong>Chapter 4:</strong> Results – <span style="color:gray;">Not Started</span></li>
+                    <li><strong>Chapter 5:</strong> Summary – <span style="color:gray;">Not Started</span></li>
+                </ul>
+            </div>`;
+    } 
+    else if (section === "tracker") {
+        title.textContent = "Submission Tracker";
+        content.innerHTML = `
+            <h3>Select Chapter</h3>
+            <div style="display:flex; gap:10px; margin-top:15px; flex-wrap:wrap;">
+                <button onclick="openChapter('chapter1')" style="padding:12px 16px; background:black; color:white; border:none; border-radius:8px;">Chapter 1</button>
+                <button onclick="openChapter('chapter2')" style="padding:12px 16px; background:black; color:white; border:none; border-radius:8px;">Chapter 2</button>
+                <button onclick="openChapter('chapter3')" style="padding:12px 16px; background:black; color:white; border:none; border-radius:8px;">Chapter 3</button>
+                <button onclick="openChapter('chapter4')" style="padding:12px 16px; background:black; color:white; border:none; border-radius:8px;">Chapter 4</button>
+                <button onclick="openChapter('chapter5')" style="padding:12px 16px; background:black; color:white; border:none; border-radius:8px;">Chapter 5</button>
+            </div>
+            <div id="chapter-content" style="margin-top:25px; padding:20px; background:white; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <p>Select a chapter to view its contents.</p>
+            </div>`;
+    } 
+    else if (section === "progressSection") {
+        title.textContent = "Progress";
+
+        let tasks = JSON.parse(localStorage.getItem("studentUploads")) || [];
+
+        content.innerHTML = `
+            <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <h2>Timeline Progress</h2>
+                <div id="tasks-container" style="margin-top:20px;"></div>
+                <div style="margin-top:20px;">
+                    <h3>Add New Task</h3>
+                    <input type="text" id="task-name" placeholder="Task Name" style="padding:8px; border-radius:5px; border:1px solid #ccc;">
+                    <input type="date" id="task-due" style="padding:8px; border-radius:5px; border:1px solid #ccc; margin-left:10px;">
+                    <button onclick="addTask()" style="padding:8px 12px; background:#16a34a; color:white; border:none; border-radius:5px; margin-left:10px;">Add Task</button>
+                </div>
+            </div>`;
+
+        const container = document.getElementById("tasks-container");
+        container.innerHTML = "";
+        const today = new Date();
+
+        if (tasks.length === 0) {
+            container.innerHTML = `<p>No tasks yet. Add tasks above to track progress.</p>`;
+        } else {
+            tasks.forEach(task => {
+                const due = new Date(task.dueDate);
+                const statusColor = today > due ? "red" : "green";
+                const taskDiv = document.createElement("div");
+                taskDiv.style.background="#f3f3f3";
+                taskDiv.style.padding="12px 16px";
+                taskDiv.style.marginBottom="10px";
+                taskDiv.style.borderRadius="8px";
+                taskDiv.style.display="flex";
+                taskDiv.style.justifyContent="space-between";
+                taskDiv.style.alignItems="center";
+                taskDiv.innerHTML = `
+                    <span>${task.name} (Due: ${task.dueDate})</span>
+                    <span style="color:${statusColor}; font-weight:bold;">${statusColor === "red" ? "Overdue" : "Pending"}</span>`;
+                container.appendChild(taskDiv);
+            });
+        }
+
+        window.addTask = function() {
+            const name = document.getElementById("task-name").value.trim();
+            const dueDate = document.getElementById("task-due").value;
+            if (!name || !dueDate) {
+                alert("Please enter task name and due date.");
+                return;
+            }
+            tasks.push({ name, dueDate });
+            localStorage.setItem("studentUploads", JSON.stringify(tasks));
+            showSection("progressSection"); // Refresh
+        };
+    } 
+    else if (section === "history") {
+        title.textContent = "History";
+        showHistory();
+    } 
+    else if (section === "notifications") {
+        title.textContent = "Notifications";
+        content.innerHTML = "<p>Group notifications will be shown here.</p>";
+    } 
+    else if (section === "progressBar") {
+        title.textContent = "Progress Bar";
+        content.innerHTML = "<p>Progress bar will appear here.</p>";
+    }
+
+    
+
+    else if (section === "feedback") {
+    title.textContent = "Feedback & Comments";
+
+    let files = JSON.parse(localStorage.getItem("groupFiles")) || [];
+
+    if (files.length === 0) {
+        content.innerHTML = `
+            <div style="background:white; padding:20px; border-radius:12px;">
+                <h3>No submissions yet</h3>
+                <p>Students have not uploaded any files.</p>
+            </div>`;
+        return;
+    }
+
+    let html = `<div style="display:flex; flex-direction:column; gap:15px;">`;
+
+    files.forEach((file, index) => {
+        html += `
+        <div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+            <h3>${file.fileName}</h3>
+            <p>Status: <b>${file.status}</b></p>
+
+            <textarea id="comment-${index}" placeholder="Write feedback..."
+                style="width:100%; height:80px; margin-top:10px; padding:10px;"></textarea>
+
+            <select id="issue-${index}" style="margin-top:10px; padding:8px;">
+                <option value="">Select Issue Type</option>
+                <option>Grammar Issue</option>
+                <option>Concept Error</option>
+                <option>Structure Issue</option>
+            </select>
+
+            <div style="margin-top:10px;">
+                <button onclick="addFeedback(${index})"
+                    style="padding:8px 12px; background:#2563eb; color:white; border:none; border-radius:6px;">
+                    Add Comment
+                </button>
+
+                <button onclick="returnForRevision(${index})"
+                    style="padding:8px 12px; background:#dc2626; color:white; border:none; border-radius:6px; margin-left:8px;">
+                    Return for Revision
+                </button>
+            </div>
+
+            <div style="margin-top:15px;">
+                <h4>Previous Comments</h4>
+                ${(file.comments || []).map(c => `
+                    <div style="background:#f3f3f3; padding:8px; margin-top:6px; border-radius:6px;">
+                        <strong>[${c.issue}]</strong> ${c.text}
+                    </div>
+                `).join("")}
+            </div>
+        </div>`;
+    });
+
+    html += `</div>`;
+    content.innerHTML = html;
+}
+
+}
+
+// ======= Chapter Handling =======
+function openChapter(chapter) {
+    const chapterBox = document.getElementById("chapter-content");
+    if (!chapterBox) return;
+
+    const chapters = {
+        chapter1: ["Background of the Study","Statement of the Problem","Conceptual Framework","Theoretical Framework","Significance of the Study","Scope and Delimitation","Definition of Terms"],
+        chapter2: ["Review of Related Literature","Review of Related Studies"],
+        chapter3: ["Research Design","Locale of the Study","Research Instrument","Data Gathering Procedures","Method of Data Analysis"],
+        chapter4: ["Presentation of Key Findings"],
+        chapter5: ["Summary","Implication of Findings","Conclusions"]
+    };
+
+    let html = `<h2>${chapter.replace("chapter","Chapter ")}</h2><ul style="line-height:2;">`;
+    chapters[chapter].forEach(item => { html += `<li>${item}</li>`; });
+    html += "</ul>";
+    chapterBox.innerHTML = html;
+}
+
+// ======= History Section =======
+function showHistory() {
+    const content = document.getElementById("section-content");
+    const uploadsData = JSON.parse(localStorage.getItem("uploads")) || [];
+
+    if (uploadsData.length === 0) {
+        content.innerHTML = `<div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+            <h2>Upload History & Version Control</h2>
+            <p>No uploads yet.</p></div>`;
+        return;
+    }
+
+    let html = `<div style="background:white; padding:20px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);"><h2>Upload History & Version Control</h2>`;
+
+    uploadsData.forEach((upload, idx) => {
+        const current = upload.current;
+        const overdue = new Date(current.dueDate) < new Date() ? "red" : "green";
+
+        html += `<div style="margin-top:20px; padding:15px; border-radius:10px; background:#f3f3f3;">
+            <strong>Chapter:</strong> ${upload.chapter}<br>
+            <strong>Student:</strong> ${current.student}<br>
+            <strong>Current File:</strong> ${current.fileName} <span style="color:${overdue}; font-weight:bold;">${overdue === "red" ? "(Overdue)" : ""}</span><br>
+            <strong>Timestamp:</strong> ${current.timestamp}<br>
+            <button onclick="compareVersions(${idx})" style="margin-top:8px; padding:6px 10px; border:none; background:#3b82f6; color:white; border-radius:5px; cursor:pointer;">Compare Versions</button>
+        </div>`;
+    });
+
+    html += "</div>";
+    content.innerHTML = html;
+}
+
+function compareVersions(uploadIndex) {
+    const uploadsData = JSON.parse(localStorage.getItem("uploads")) || [];
+    const upload = uploadsData[uploadIndex];
+
+    let html = `<h3>Version History for ${upload.chapter} - ${upload.current.student}</h3><ul style="line-height:1.8;">`;
+    html += `<li><strong>Current:</strong> ${upload.current.fileName} (${upload.current.timestamp})</li>`;
+    upload.versions.forEach((v, idx) => {
+        html += `<li><strong>Version ${idx+1}:</strong> ${v.fileName} (${v.timestamp}) 
+            <button onclick="revertVersion(${uploadIndex}, ${idx})" style="margin-left:10px; padding:4px 8px; border:none; background:#ef4444; color:white; border-radius:5px; cursor:pointer;">Revert</button>
+        </li>`;
+    });
+    html += "</ul>";
+    document.getElementById("section-content").innerHTML = html;
+}
+
+function revertVersion(uploadIndex, versionIndex) {
+    const uploadsData = JSON.parse(localStorage.getItem("uploads")) || [];
+    const upload = uploadsData[uploadIndex];
+    upload.versions.unshift({...upload.current});
+    upload.current = {...upload.versions.splice(versionIndex+1,1)[0]};
+    localStorage.setItem("uploads", JSON.stringify(uploadsData));
+    alert("Version reverted successfully!");
+    showHistory();
+}
+
+// ======= Simulate Student Upload (use this in Student Dashboard) =======
+function simulateStudentUpload(chapter, student, fileName, dueDate) {
+    const uploadsData = JSON.parse(localStorage.getItem("uploads")) || [];
+    const timestamp = new Date().toLocaleString();
+    const existing = uploadsData.find(u => u.chapter === chapter && u.current.student === student);
+    if (existing) {
+        existing.versions.unshift({...existing.current});
+        existing.current = {student, fileName, timestamp, dueDate};
+    } else {
+        uploadsData.push({chapter, current:{student, fileName, timestamp, dueDate}, versions:[]});
+    }
+    localStorage.setItem("uploads", JSON.stringify(uploadsData));
+
+
+    
+}
+// ======= Default Section =======
+showSection("overview");
+
+
+
+function addFeedback(index) {
+    let files = JSON.parse(localStorage.getItem("groupFiles")) || [];
+    const text = document.getElementById(`comment-${index}`).value.trim();
+    const issue = document.getElementById(`issue-${index}`).value;
+
+    if (!text || !issue) {
+        alert("Please write a comment and select an issue type.");
+        return;
+    }
+
+    if (!files[index].comments) files[index].comments = [];
+    files[index].comments.push({ text, issue });
+
+    localStorage.setItem("groupFiles", JSON.stringify(files));
+    showSection("feedback");
+}
+
+function returnForRevision(index) {
+    let files = JSON.parse(localStorage.getItem("groupFiles")) || [];
+    files[index].status = "Returned for Revision";
+    localStorage.setItem("groupFiles", JSON.stringify(files));
+    alert("File returned for revision.");
+    showSection("feedback");
+}
+
+
+
+
+</script>
+
+</body>
+</html>
+

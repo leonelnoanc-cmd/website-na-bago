@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Groups</title>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif;}
+    body { background:#f0f2f5; min-height:100vh; display:flex; justify-content:center; padding:30px;}
+    .main-content { width:95%; max-width:1100px;}
+    .main-content h1 { text-align:center; margin-bottom:20px; color:#111827;}
+    #add-group-bar { display:flex; justify-content:center; margin-bottom:20px;}
+    #add-group-bar div { display:flex; align-items:center; background:lightgray; padding:12px 20px; border-radius:12px; width:95%; max-width:1100px; cursor:pointer; color:black; font-weight:bold; justify-content:space-between;}
+    #add-group-form { display:none; justify-content:center; margin-bottom:20px;}
+    #add-group-form input { padding:8px; margin-right:10px; border-radius:5px; border:1px solid #ccc; width:300px;}
+    #add-group-form button { padding:8px 12px; background:#16a34a; color:white; border:none; border-radius:5px; cursor:pointer;}
+    .card-container { display:flex; flex-direction:column; gap:15px;}
+    .card { background:lightgray; padding:20px 30px; border-radius:12px; box-shadow:0 4px 10px black; text-align:left; display:flex; justify-content:space-between; align-items:center; cursor:pointer;}
+    .card h3 { color:black; font-size:18px;}
+    .delete-btn { background:#ef4444; color:white; border:none; border-radius:5px; padding:6px 10px; cursor:pointer;}
+    @media(max-width:768px){body{padding:15px;} #add-group-bar div{width:90%;} #add-group-form input{width:60%;}}
+</style>
+</head>
+<body>
+
+<div class="main-content">
+    <h1>Groups</h1>
+
+    <div id="add-group-bar">
+        <div id="add-group-btn">
+            <span>Add New Group</span>
+            <span style="font-size:20px;">+</span>
+        </div>
+    </div>
+
+    <div id="add-group-form">
+        <input type="text" id="group-title" placeholder="Group Name">
+        <button onclick="addGroup()">Add</button>
+    </div>
+
+    <div class="card-container"></div>
+</div>
+
+<script>
+const cardContainer = document.querySelector(".card-container");
+
+function loadGroups() {
+    const groups = JSON.parse(localStorage.getItem("groups")) || [];
+    cardContainer.innerHTML = "";
+    groups.forEach(title => createCard(title));
+}
+
+function saveGroups(groups) {
+    localStorage.setItem("groups", JSON.stringify(groups));
+}
+
+function createCard(title) {
+    const newCard = document.createElement("div");
+    newCard.classList.add("card");
+
+    const groupTitle = document.createElement("h3");
+    groupTitle.textContent = title;
+
+    const renameBtn = document.createElement("button");
+    renameBtn.textContent = "Rename";
+    renameBtn.classList.add("delete-btn"); 
+    renameBtn.style.background="#3b82f6";
+    renameBtn.style.marginRight="10px";
+    renameBtn.addEventListener("click",(e)=>{
+        e.stopPropagation();
+        const newName = prompt("Enter new group name:", title);
+        if(newName && newName.trim()!=="") renameGroup(title,newName.trim());
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent="Delete";
+    deleteBtn.classList.add("delete-btn");
+    deleteBtn.addEventListener("click",(e)=>{
+        e.stopPropagation();
+        deleteGroup(title);
+    });
+
+    // ✅ Redirect to single group.html with query parameter
+    newCard.addEventListener("click",()=>{
+        const url = "group-ambot.html?name=" + encodeURIComponent(title);
+        window.location.href = url;
+    });
+
+    newCard.appendChild(groupTitle);
+
+    const buttonWrapper = document.createElement("div");
+    buttonWrapper.style.display="flex";
+    buttonWrapper.appendChild(renameBtn);
+    buttonWrapper.appendChild(deleteBtn);
+
+    newCard.appendChild(buttonWrapper);
+    cardContainer.appendChild(newCard);
+}
+
+function addGroup() {
+    const title = document.getElementById("group-title").value.trim();
+    if(!title){ alert("Please enter a group name."); return;}
+    const groups = JSON.parse(localStorage.getItem("groups")) || [];
+    groups.push(title);
+    saveGroups(groups);
+    loadGroups();
+    document.getElementById("group-title").value="";
+}
+
+function deleteGroup(title){
+    let groups = JSON.parse(localStorage.getItem("groups")) || [];
+    groups = groups.filter(g=>g!==title);
+    saveGroups(groups);
+    loadGroups();
+}
+
+function renameGroup(oldName,newName){
+    let groups = JSON.parse(localStorage.getItem("groups")) || [];
+    const index = groups.indexOf(oldName);
+    if(index!==-1){ groups[index]=newName; saveGroups(groups); loadGroups();}
+}
+
+document.getElementById("add-group-btn").addEventListener("click",()=>{
+    const form = document.getElementById("add-group-form");
+    form.style.display = form.style.display==="none" ? "flex" : "none";
+});
+
+window.onload = loadGroups;
+</script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #cfcfcf, #e6e6e6, #bfbfbf);
+            background-size: 200% 200%;
+            animation: grayMove 6s ease infinite alternate;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            width: 380px;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: left top;}
+            100% { background-position: right bottom;}
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: darkgray;
+            outline: none;
+            box-shadow: 0 0 8px rgba(76,175,80,0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: black;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: gray;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .success {
+            color: green;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Create an Account</h2>
+        
+        <form id="signupForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required minlength="6">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+
+            <p id="message"></p>
+
+            <button type="submit">Sign Up</button>
+        </form>
+
+        <p class="login-link">
+            Already have an account? <a href="login.html">Login</a>
+        </p>
+    </div>
+
+    <script>
+    const form = document.getElementById("signupForm");
+    const msg = document.getElementById("message");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        let username = document.getElementById("username").value.trim();
+        let email = document.getElementById("email").value.trim();
+        let password = document.getElementById("password").value;
+        let confirmPassword = document.getElementById("confirmPassword").value;
+
+        msg.textContent = "";
+        msg.className = "";
+
+        if (username.length < 3) {
+            msg.textContent = "Username must be at least 3 characters.";
+            msg.className = "error";
+            return;
+        }
+
+        if (password.length < 6) {
+            msg.textContent = "Password must be at least 6 characters.";
+            msg.className = "error";
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            msg.textContent = "Passwords do not match!";
+            msg.className = "error";
+            return;
+        }
+
+        msg.textContent = "Account created successfully!";
+        msg.className = "success";
+
+        // 🔥 Redirect to role chooser page
+        setTimeout(() => {
+            window.location.href = "role.html";
+        }, 800);
+    });
+
+    // Ensure login link works
+    document.querySelector(".login-link a").addEventListener("click", function(event) {
+        event.preventDefault();
+        window.location.href = "login.html";
+    });
+
+</script>
+
+</body>
+</html>
