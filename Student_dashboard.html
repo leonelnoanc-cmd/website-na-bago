@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Dashboard</title>
+
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+    display: flex;
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: 220px;
+    background: #fff;
+    padding: 30px 20px;
+    border-right: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.05);
+}
+
+.sidebar h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.sidebar button {
+    padding: 14px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #667eea;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* --- MAIN CONTENT --- */
+.main-content {
+    flex: 1;
+    padding: 30px;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px;
+}
+
+.logout-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid white;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* WELCOME BOX */
+.welcome-box {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+/* DASHBOARD SECTIONS */
+.dashboard-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.progress-circle {
+    font-size: 42px;
+    font-weight: bold;
+    color: #667eea;
+    text-align: center;
+}
+
+.progress-label {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+
+.task-list li {
+    background: #f5f7fa;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.task-pending { color: #e67e22; font-weight: 600; }
+.task-done { color: #27ae60; font-weight: 600; }
+
+/* SECTION INFO */
+.section-info {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+/* COURSES */
+.empty-state {
+    text-align: center;
+    color: #999;
+}
+
+/* MODAL */
+.section-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.section-modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+}
+
+/* Sidebar feature icon cards */
+.sidebar .feature-cards { display:flex; flex-direction:column; gap:14px; align-items:center; }
+.sidebar .feature-card {
+    width:70px; height:70px; border-radius:50%; background:#f0f3ff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:26px; cursor:pointer; transition:transform .12s ease, background .12s ease; outline:none;
+}
+.sidebar .feature-card:hover, .sidebar .feature-card:focus { transform:scale(1.06); background:#e8efff; }
+.sidebar .feature-card .feature-label { font-size:11px; font-weight:700; margin-top:6px; color:#333; text-align:center; }
+.sidebar h2 { margin:0 0 8px 0; font-size:16px; }
+
+/* Overview card */
+.overview-card small { color:#666; }
+.overview-card .recent-item { cursor:pointer; padding:6px; border-radius:6px; }
+.overview-card .recent-item:hover { background:#f0f4ff; }
+.overview-card .no-data { color:#999; font-size:13px; }
+
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <h2>FEATURES</h2>
+    <div class="feature-cards">
+        <div class="feature-card overview" title="Overview" role="button" tabindex="0">
+            <div class="feature-icon">📊</div>
+            <div class="feature-label">Overview</div>
+        </div>
+        <div class="feature-card paper" title="Research Paper Creator" role="link" tabindex="0">
+            <div class="feature-icon">📝</div>
+            <div class="feature-label">Paper Creator</div>
+        </div>
+    </div>
+</div>
+
+<div class="main-content">
+
+    <div class="header">
+        <h1>👨‍🎓 Student Dashboard</h1>
+        <button class="logout-btn" type="button" id="logoutBtn">Logout</button>
+    </div>
+
+    <div class="welcome-box">
+        <h2>Welcome to Student Dashboard</h2>
+        <p>Track your progress, submit assignments, and communicate with your advisor.</p>
+    </div>
+
+    <!-- ✅ Progress & Tasks (kept minimal, original layout preserved) -->
+    <div class="dashboard-sections">
+        <div class="dashboard-card">
+            <h3>📈 Progress Percentage</h3>
+            <div class="progress-circle" id="overallProgress">0%</div>
+            <p class="progress-label">Overall research completion</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>📝 Tasks</h3>
+            <ul class="task-list">
+                <li>Submit research proposal <span class="task-pending">Pending</span></li>
+                <li>Chapter 1 revision <span class="task-done">Done</span></li>
+                <li>Meet advisor <span class="task-pending">Pending</span></li>
+            </ul>
+        </div>
+
+        <div class="dashboard-card overview-card" id="overviewSummary">
+            <h3>🔍 Overview</h3>
+            <div id="overviewStatus" style="margin-bottom:10px; color:#333;"></div>
+            <div style="display:flex; gap:12px; margin-bottom:10px; align-items:flex-start;">
+                <div style="flex:1;">
+                    <strong>Upcoming</strong>
+                    <div id="upcomingList" style="font-size:13px; color:#666; margin-top:6px; min-height:34px;">—</div>
+                </div>
+                <div style="flex:1;">
+                    <strong>Recently Edited</strong>
+                    <div id="recentEdits" style="font-size:13px; color:#666; margin-top:6px; min-height:34px;">—</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-info">
+        <strong>Group:</strong> Loading...
+    </div>
+
+    <div id="coursesContainer" class="empty-state">
+        <p>No courses assigned yet. Contact your advisor for enrollment.</p>
+    </div>
+
+</div>
+
+<script>
+/* Progress animation and dashboard behavior */
+document.addEventListener('DOMContentLoaded', () => {
+    // Progress animation
+    let target = 72;
+    let current = 0;
+    const el = document.getElementById('overallProgress');
+    const timer = setInterval(() => {
+        if (current >= target) clearInterval(timer);
+        else el.textContent = ++current + "%";
+    }, 15);
+
+    // Initialize variables
+    let sectionName = null;
+    let groupsFromUrl = [];
+    let currentGroup = null;
+
+    // Parse URL params
+    try {
+        const params = new URLSearchParams(location.search);
+        if (params.has('section')) {
+            sectionName = decodeURIComponent(params.get('section'));
+        }
+        if (params.has('groups')) {
+            try {
+                groupsFromUrl = JSON.parse(decodeURIComponent(params.get('groups')));
+            } catch(e) {
+                console.warn('Failed to parse groups param', e);
+            }
+        }
+    } catch(e) { console.warn('Failed to read URL params', e); }
+
+    // Fallback to localStorage
+    const storedSection = JSON.parse(localStorage.getItem('currentSection') || 'null');
+    if (!sectionName && storedSection) sectionName = storedSection.name || storedSection;
+
+    // Use groups from localStorage if not provided in URL
+    const allSectionGroups = JSON.parse(localStorage.getItem('allSectionGroups') || '{}');
+    const groupsFromStorage = sectionName ? (allSectionGroups[sectionName] || []) : [];
+    const groups = groupsFromUrl.length ? groupsFromUrl : groupsFromStorage;
+
+    // Determine current group
+    const storedCurrentGroup = JSON.parse(localStorage.getItem('currentGroup') || 'null');
+    if (storedCurrentGroup) currentGroup = storedCurrentGroup;
+    else if (groups.length) currentGroup = groups[0];
+
+    // Update UI
+    const sectionInfoEl = document.querySelector('.section-info');
+    if (sectionName) {
+        sectionInfoEl.innerHTML = `<strong>Section:</strong> ${sectionName} <br><strong>Group:</strong> ${currentGroup ? (currentGroup.groupName || currentGroup.name || currentGroup.group) : 'None selected'}`;
+        // Save section for other pages
+        localStorage.setItem('currentSection', JSON.stringify({ name: sectionName }));
+    } else {
+        sectionInfoEl.innerHTML = `<strong>Group:</strong> ${currentGroup ? (currentGroup.groupName || currentGroup.name || currentGroup.group) : 'None selected'}`;
+    }
+
+    // Sidebar feature handlers
+    (function(){
+        const ov = document.querySelector('.feature-card.overview');
+        const paper = document.querySelector('.feature-card.paper');
+        if (ov) {
+            ov.addEventListener('click', () => {
+                const target = document.getElementById('overallProgress') || document.querySelector('.dashboard-sections');
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            ov.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') ov.click(); });
+        }
+        if (paper) {
+            paper.addEventListener('click', () => {
+                // Pass current section context if available
+                if (sectionName) localStorage.setItem('currentSection', JSON.stringify({ name: sectionName }));
+                window.location.href = 'research-paper-creator.html';
+            });
+            paper.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') paper.click(); });
+        }
+    })();
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('currentGroup');
+        localStorage.removeItem('currentSection');
+        window.location.href = 'login.html';
+    });
+
+    // render initial overview summary
+    document.addEventListener('DOMContentLoaded', renderOverviewSummary);
+
+    // allow refresh of overview when page becomes visible (useful after editing on the editor page)
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) renderOverviewSummary(); });
+});
+
+// Overview & recent edits
+function getPaperKeyForDashboard(){
+    try{
+        const g = JSON.parse(localStorage.getItem('currentGroup') || 'null');
+        if (g && (g.id || g.name)) return 'paper_' + (g.id || g.name);
+        const u = JSON.parse(localStorage.getItem('loggedInUser') || 'null');
+        if (u && (u.id || u.name)) return 'paper_user_' + (u.id || u.name);
+    }catch(e){}
+    return 'paper_anonymous';
+}
+
+function renderOverviewSummary(){
+    const key = getPaperKeyForDashboard();
+    let payload = {};
+    try { payload = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { payload = {}; }
+
+    const sections = payload.sections || {};
+    const timestamps = payload.timestamps || {};
+    const sectionNames = ['Title','Introduction','Methodology','Results','Discussion','Conclusion'];
+
+    // Completion by filled sections
+    const filled = sectionNames.filter(s => (sections[s] || '').replace(/<[^>]*>/g, '').trim().length > 0).length;
+    const total = sectionNames.length;
+    const completion = Math.round((filled/total) * 100);
+
+    // status text
+    let status = 'Not Started';
+    if (filled === 0) status = 'Not Started';
+    else if (filled === total) status = 'Completed';
+    else status = 'In Progress';
+
+    const statusEl = document.getElementById('overviewStatus');
+    if (statusEl) statusEl.innerHTML = `<div><strong>Status:</strong> ${status} &nbsp; &nbsp; <strong>Sections done:</strong> ${filled}/${total} &nbsp; &nbsp; <strong>Completion:</strong> ${completion}%</div>`;
+
+    // upcoming tasks from timelineSections
+    const upcomingEl = document.getElementById('upcomingList');
+    try{
+        const timeline = JSON.parse(localStorage.getItem('timelineSections') || '[]');
+        if (!timeline || !timeline.length){ upcomingEl.innerHTML = '<div class="no-data">No deadlines set.</div>'; }
+        else{
+            const today = new Date(); today.setHours(0,0,0,0);
+            const soon = timeline.map(t => ({ name: t.name, deadline: new Date(t.deadline + 'T00:00:00') })).map(item => { return { name: item.name, daysLeft: Math.floor((item.deadline - today)/(24*60*60*1000)) }; }).sort((a,b)=>a.daysLeft - b.daysLeft);
+            const show = soon.slice(0,3).map(it => `<div style="margin-bottom:6px;">${it.name} — ${it.daysLeft < 0 ? 'Overdue ' + Math.abs(it.daysLeft) + 'd' : it.daysLeft===0 ? 'Due Today' : 'In ' + it.daysLeft + 'd'}</div>`).join('');
+            upcomingEl.innerHTML = show || '<div class="no-data">No upcoming tasks</div>';
+        }
+    }catch(e){ upcomingEl.innerHTML = '<div class="no-data">No timeline data</div>'; }
+
+    // recent edits
+    const recentEl = document.getElementById('recentEdits');
+    const items = Object.keys(timestamps).filter(k=>timestamps[k]).map(k=>({ section: k, time: timestamps[k] })).sort((a,b)=> new Date(b.time) - new Date(a.time));
+    if (!items.length){ recentEl.innerHTML = '<div class="no-data">No recent edits</div>'; }
+    else{
+        const html = items.slice(0,4).map(it => {
+            const d = new Date(it.time);
+            return `<div class="recent-item" data-section="${encodeURIComponent(it.section)}">${it.section} — <small>${d.toLocaleString()}</small></div>`;
+        }).join('');
+        recentEl.innerHTML = html;
+
+        // click to open in paper creator (with section preselect)
+        recentEl.querySelectorAll('.recent-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const section = decodeURIComponent(el.getAttribute('data-section'));
+                // Save context and open creator with ?section=
+                const url = 'research-paper-creator.html?section=' + encodeURIComponent(section);
+                window.location.href = url;
+            });
+        });
+    }
+}
+
+</script>
+
+</body>
+</html>
